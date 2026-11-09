@@ -16,6 +16,8 @@ npm run preview
 
 Open http://localhost:3000. Wait for **“Offline ready · the whole catalog is saved”** before turning off the network. You can then reload the homepage, browse the collection and open any of the 12 product URLs, including a product you never opened while online.
 
+Build and type-check commands clear generated route types first. This prevents cached routes from a different branch from affecting this example. Stop any running development server before switching branches or rebuilding. Your source files and local environment file are preserved.
+
 `npm run dev` is for design work; it does not register the service worker. Stop the dev server before using the production preview on the same port. The preview sets HTTP `Cache-Control: no-store` so the tutorial demonstrates the service worker rather than the normal HTTP cache.
 
 ## How offline caching works

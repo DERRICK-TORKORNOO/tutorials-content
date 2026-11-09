@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prebuild": "node scripts/clean-build.mjs",
+    "pretypecheck": "node scripts/clean-build.mjs --types"
   },
   "dependencies": {
     "lucide-react": "latest",
