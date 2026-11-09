@@ -1,7 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { useMutation, onlineManager } from "@tanstack/react-query";
+import {
+  useMutation,
+  useMutationState,
+  onlineManager,
+} from "@tanstack/react-query";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -132,15 +136,26 @@ export function Shop({
     view === "detail" ? detail : catalog,
     view === "detail" ? ["product", slug] : ["products", {}],
   );
+  const [backOnline, setBackOnline] = useState(false);
+  useEffect(() => {
+    const show = () => {
+      setBackOnline(true);
+      setTimeout(() => setBackOnline(false), 2000);
+    };
+    window.addEventListener("online", show);
+    return () => window.removeEventListener("online", show);
+  }, []);
   const order = useMutation<
     { orderRef: string; total: number },
     Error,
     { items: CartItem[]; requestId: string }
-  >({
-    mutationKey: ["placeOrder"],
-    networkMode: "always",
-    onError: (e) => setToast(e.message),
+  >({ mutationKey: ["placeOrder"], onError: (e) => setToast(e.message) });
+  const pendingOrders = useMutationState({
+    filters: { mutationKey: ["placeOrder"], status: "pending" },
+    select: (mutation) => mutation.state.isPaused,
   });
+  const hasPendingOrder = pendingOrders.length > 0;
+  const hasPausedOrder = pendingOrders.some(Boolean);
   useEffect(() => {
     try {
       setCart(JSON.parse(localStorage.getItem("kudi-cart") ?? "[]"));
@@ -157,6 +172,9 @@ export function Shop({
       );
     };
     window.addEventListener("order-received", receipt);
+    const orderFailed = (event: Event) =>
+      setToast((event as CustomEvent<string>).detail);
+    window.addEventListener("order-failed", orderFailed);
     const offlineNav = (event: MouseEvent) => {
       if (!navigator.onLine) {
         const a = (event.target as HTMLElement).closest("a");
@@ -182,6 +200,7 @@ export function Shop({
       window.removeEventListener("beforeinstallprompt", prompt);
       document.removeEventListener("click", offlineNav, true);
       window.removeEventListener("order-received", receipt);
+      window.removeEventListener("order-failed", orderFailed);
     };
   }, []);
   useEffect(() => {
@@ -194,6 +213,12 @@ export function Shop({
     }
   }, [toast]);
   const add = (p: Product) => {
+    if (hasPendingOrder) {
+      setToast(
+        "Your order is saved. Wait for it to finish before adding more.",
+      );
+      return;
+    }
     setCart((old) => {
       const found = old.find((i) => i.slug === p.slug);
       return found
@@ -225,6 +250,7 @@ export function Shop({
     0,
   );
   const change = (slug: string, delta: number) =>
+    !hasPendingOrder &&
     setCart((old) =>
       old
         .map((i) =>
@@ -288,6 +314,16 @@ export function Shop({
           </div>
         </div>
       </header>
+      {backOnline && (
+        <div className="offline online">
+          <Check size={16} /> Back online. All caught up.
+        </div>
+      )}
+      {!online && (
+        <div className="offline">
+          <WifiOff size={16} /> You’re offline. Showing saved products.
+        </div>
+      )}
       {searchOpen && (
         <div className="container search-bar">
           <Search size={20} />
@@ -666,6 +702,7 @@ export function Shop({
                         </div>
                         <button
                           className="remove"
+                          disabled={hasPendingOrder}
                           aria-label={`Remove ${p.name}`}
                           onClick={() =>
                             setCart((c) =>
@@ -696,7 +733,7 @@ export function Shop({
                   </p>
                   <button
                     className="button"
-                    disabled={order.isPending}
+                    disabled={hasPendingOrder}
                     onClick={() =>
                       order.mutate({
                         items: cart,
@@ -704,14 +741,14 @@ export function Shop({
                       })
                     }
                   >
-                    {order.isPaused
+                    {hasPausedOrder
                       ? "Saved for when you’re online"
-                      : order.isPending
+                      : hasPendingOrder
                         ? "Placing order…"
                         : "Place demo order"}
                     <ArrowUpRight size={18} />
                   </button>
-                  {order.isPaused && (
+                  {hasPausedOrder && (
                     <p className="paused">
                       Order saved. It will be sent when you’re back online.
                     </p>
@@ -762,6 +799,20 @@ export function Shop({
             © {new Date().getFullYear()} Kudi Store. Made for your rhythm.
           </span>
           <span>Designed for life. Even offline.</span>
+          {install && (
+            <button onClick={() => install.prompt?.()}>
+              Install app <ArrowDown size={14} />
+            </button>
+          )}
+          {ios && (
+            <button
+              onClick={() =>
+                setToast("In Safari, tap Share, then Add to Home Screen.")
+              }
+            >
+              Install app
+            </button>
+          )}
         </div>
       </footer>
       {toast && (

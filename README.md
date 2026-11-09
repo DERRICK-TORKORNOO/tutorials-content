@@ -83,4 +83,4 @@ No deployment has been performed. Import the repo into Vercel and select the Nex
 
 ## Validation limits
 
-Production build, strict TypeScript, lint, and local API checks are run during development. Browser checks cover desktop/390px layout, shopping, product navigation and checkout. Real airplane-mode behavior, iOS installation and Lighthouse scoring must still be verified on the target phone before recording; those results are not claimed by the source checks. Redis mode needs your own Upstash environment to verify against a live instance.
+Production build, strict TypeScript, lint, and local API checks are run during development. Browser checks cover desktop/390px layout, shopping, product navigation and checkout. A visited product also reloaded successfully with the local production server stopped; see `VALIDATION.md`. Real airplane-mode behavior, iOS installation and Lighthouse scoring must still be verified on the target phone before recording; those results are not claimed by the source checks. Redis mode needs your own Upstash environment to verify against a live instance.

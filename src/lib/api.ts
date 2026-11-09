@@ -4,6 +4,13 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
     cache: "no-store",
     headers: { "Content-Type": "application/json", ...options?.headers },
   });
+  if (typeof window !== "undefined") {
+    const version = Number(r.headers.get("X-Catalog-Version"));
+    if (version > Number(localStorage.getItem("catalogVersion") ?? 0))
+      window.dispatchEvent(
+        new CustomEvent("catalog-version", { detail: version }),
+      );
+  }
   const body = await r.json();
   if (!r.ok) throw Error(body.error?.message ?? "Something went wrong.");
   return body;
