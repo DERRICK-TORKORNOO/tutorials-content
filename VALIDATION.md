@@ -1,8 +1,8 @@
 # Validation · Supabase edition
 
-The user has not created a Supabase account yet. No external database, bucket, account or deployment was created.
+The integration suite runs against a test-only PostgreSQL engine. Live-service verification requires a configured Supabase project.
 
-All five active milestone branches passed lint, TypeScript, the integration suite and production builds. `main` and `step-5-offline-ux` point to the finished app.
+The complete application is on `main`. The independent service-worker example is on `tutorial-1`.
 
 ## Automated coverage
 
@@ -30,4 +30,4 @@ The actual Drizzle repository and Hono API are exercised with test-only PostgreS
 
 ## Limitations
 
-Live Supabase pooler connections and Storage REST permissions need the owner's future account and environment. A local SQL engine cannot verify those external services. Real-phone airplane-mode/reconnect and offline order reload, iOS installation and Lighthouse scoring remain manual checks after configuration. No score or live cloud result is claimed.
+Live Supabase pooler connections and Storage REST permissions require a configured project. A local SQL engine cannot verify those external services. Real-phone airplane-mode/reconnect and offline order reload, iOS installation and Lighthouse scoring remain manual checks after configuration. No score or live cloud result is claimed.

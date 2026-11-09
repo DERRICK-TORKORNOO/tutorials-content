@@ -1,6 +1,6 @@
 # Kudi Store · offline shop tutorial
 
-A Next.js shop with a full store admin, Supabase Postgres, private product image uploads, and five offline-caching milestones. The original forest-green storefront stays; the control room at `/admin` adds product management, live requests, orders and demo settings. Checkout is a demo and never takes payment.
+Explore offline-first web development with a Next.js shop, Supabase Postgres and private product image uploads. The dashboard at `/admin` provides product management, live request statistics, orders and network settings. Checkout creates sample orders without taking payment.
 
 **You can install, build and test the code before creating a Supabase account.** The running shop needs your database configuration. It deliberately has no Redis or in-memory application fallback.
 
@@ -126,77 +126,38 @@ Admin header: `x-admin-key`. Admin endpoints: `GET admin/session`, `admin/overvi
 
 Uploads accept one multipart `file` (JPEG/PNG/WebP, max 5 MB); Sharp verifies and converts it to WebP, rotates correctly and limits width to 1200px. Up to four resulting same-origin image URLs may be assigned to a product. Source files up to 5 MB are accepted in the form; files over 4 MB are resized in the browser before transport to fit [Vercel’s 4.5 MB request limit](https://vercel.com/docs/functions/limitations). The server still verifies and converts every upload. Direct API clients must respect their hosting provider’s request limit. Archived products return 404 publicly and render “This product is no longer available” with a return-to-shop link.
 
-## Five tutorial branches
+## Learning path
 
-`main` equals `step-5-offline-ux`. The previous Redis edition is preserved under `legacy/step-*` branches and `legacy-v*-step-*` tags. The active milestones all use this Supabase backend/admin.
+The repository has two branches:
 
-### 1 · `step-1-fetch` / `v1-step-1`
+- `tutorial-1`: a standalone static shop that caches documents, scripts, styles, catalog JSON and images with a service worker. It needs no database or API keys.
+- `main`: the complete application with a Supabase backend, admin dashboard, persisted query cache and offline order handling.
 
-`useCatalog.ts` uses `useEffect` and local state. Every catalog screen mount makes a request. Visit a product, go back and visit again; watch the admin counter rise. With no network, uncached pages fail. Next.js router prefetch can affect navigation; use full page navigations for the simplest filming comparison.
+### Service-worker caching
 
-### 2 · `step-2-tanstack` / `v2-step-2`
+The service worker saves the app shell and product images. In this branch, API JSON responses use the network; TanStack Query owns the data cache. This separates the files needed to load the app from the catalog data displayed inside it.
 
-```ts
-const catalog = useQuery({ queryKey: ['products', {}], queryFn: loadProducts });
-// Reuse recently fetched data while navigating.
-staleTime: 60_000,
-// Keep visited queries in memory for a day.
-gcTime: 86_400_000,
-// Avoid a long retry loop while demonstrating a failure.
-retry: 1,
-```
+### Query persistence
 
-Navigate back within a minute and watch the request count stay stable. Details can show list summary placeholders immediately but still need their full response. Reloading loses the in-memory data.
+Successful shop queries are saved in IndexedDB for up to 24 hours. Admin queries are excluded. Add `?debug=1` to the shop URL to inspect whether data came from the network, memory or a restored cache.
 
-### 3 · `step-3-persist` / `v3-step-3`
+### Catalog freshness
 
-```tsx
-<PersistQueryClientProvider
-  client={client}
-  persistOptions={{
-    persister,
-    maxAge: 86_400_000,
-    buster: process.env.NEXT_PUBLIC_APP_VERSION,
-    dehydrateOptions: {
-      shouldDehydrateQuery: (q) =>
-        q.state.status === "success" && q.queryKey[0] !== "admin",
-    },
-  }}
-/>
-```
+The client checks the catalog version at startup, when the tab becomes visible and after reconnection. A changed version invalidates catalog queries. With an unchanged version, the cached catalog stays available without another full download.
 
-Successful shop queries survive an online reload. Admin queries never enter IndexedDB. Use `?debug=1` to see the source label. A full offline reload still cannot load the app shell at this stage.
+### Offline orders
 
-### 4 · `step-4-pwa` / `v4-step-4`
+Place an order offline, reload the page, then reconnect. The saved mutation resumes automatically and the received order appears in Admin Orders. A stable request ID prevents duplicate orders if a response is lost.
 
-```js
-// Check product images before the generic API rule.
-if (path.startsWith("/img/products/") || path.startsWith("/api/v1/images/")) {
-  // CacheFirst; product-images cache; 100 entries; 30-day expiry.
-}
-// Every other API response is NetworkOnly.
-if (path.startsWith("/api/")) return;
-```
+### Explore changes across devices
 
-Build and preview. Load the shop, visit product details, wait for the worker to activate, then go offline and reload the visited URL. The HTML/JS/CSS/fonts come from the shell cache, viewed images from the image cache, and data from IndexedDB. Unvisited full product details are not promised offline. Admin pages require a connection and are not document-cached.
-
-### 5 · `step-5-offline-ux` / `v5-step-5` / `main`
-
-```ts
-client.setMutationDefaults(["placeOrder"], { mutationFn: placeOrder });
-// In persistence restoration's onSuccess:
-void client.resumePausedMutations();
-// The order variables include a stable requestId and client-created timestamp.
-order.mutate({ items, requestId, createdAt });
-```
-
-Catalog freshness uses version checks on start, visibility and reconnection rather than elapsed time. Existing data shows its update age. The offline banner and install affordances explain the state. Queue an order offline, reload, reconnect and watch it arrive in Admin Orders; a delayed order receives the timing label. Change a price or archive a product on the laptop while the phone is offline; the phone updates on reconnection. New products/categories appear after invalidation. Old cache shapes are dropped when the app version changes; finish any queued v1 orders before upgrading.
+Open the shop in one browser and the admin dashboard in another. Disconnect the shop, then edit a price, add a product or archive an item through the dashboard. Reconnect the shop to observe the refreshed catalog and product availability state.
 
 ## Deployment
 
-No deployment or Supabase account has been created. Once your own project works locally, import the repository into Vercel using the **Next.js preset** and add the four server environment variables. `npm run build` is the build command. Next handles routing; do not add an `index.html` SPA rewrite. Each tutorial branch can have its own Vercel preview URL. Service workers need HTTPS or localhost.
+Once your project works locally, import the repository into Vercel using the **Next.js preset** and add the four server environment variables. `npm run build` is the build command. Next handles routing; do not add an `index.html` SPA rewrite. Use separate Vercel deployments for `main` and `tutorial-1` when comparing their behaviour. Service workers need HTTPS or localhost.
 
-This retains your requested **Next.js** implementation. Hono is mounted through `hono/vercel` in a Next Route Handler; Vite/React Router and vite-plugin-pwa are replaced with Next routing and the native service worker. Styling remains CSS rather than Tailwind. Photography is local; category variants share two photo crops. See `public/img/CREDITS.md` and `public/fonts/CREDITS.md`.
+The application uses **Next.js** routing, Hono through `hono/vercel`, CSS and a native service worker. Photography is local; category variants share two photo crops. See `public/img/CREDITS.md` and `public/fonts/CREDITS.md`.
 
 ## Tests and remaining checks
 

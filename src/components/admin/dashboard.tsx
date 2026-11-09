@@ -216,7 +216,7 @@ export function AdminDashboard({
           </Link>
           <div className="signin-story-copy">
             <div className="eyebrow">
-              <Leaf size={16} /> THE GOOD FINDS, BEHIND THE SCENES
+              <Leaf size={16} /> YOUR COLLECTION, THOUGHTFULLY MANAGED
             </div>
             <h1>
               Good things.
@@ -387,7 +387,7 @@ export function AdminDashboard({
                     ? "Thoughtfully picked. Easily managed."
                     : section === "orders"
                       ? "From the first tap to a place in their everyday."
-                      : "Set the pace for your offline demo."}
+                      : "Manage network behaviour and sample data."}
               </p>
             </div>
             {section === "products" ? (
@@ -753,8 +753,8 @@ export function AdminDashboard({
                   </span>
                   <h2>Give the network a pace.</h2>
                   <p>
-                    Slow catalog responses to make caching easier to see on
-                    camera.
+                    Simulate a slow connection to compare network requests with
+                    cached responses.
                   </p>
                   <div className="slow-options">
                     {[0, 800, 2000].map((ms) => (
@@ -806,7 +806,7 @@ export function AdminDashboard({
                   <span className="metric-icon">
                     <RotateCcw size={22} />
                   </span>
-                  <h2>Ready for another take?</h2>
+                  <h2>Restore the sample collection?</h2>
                   <p>
                     Restore the 12 seed products and 4 categories, clear orders
                     and stats, and delete uploaded images. The catalog version
@@ -819,7 +819,7 @@ export function AdminDashboard({
                       setConfirm({
                         title: "Reset the demo data?",
                         description:
-                          "This permanently removes custom products, orders and uploaded images, restores the seed collection, and clears the request log. Use this only for your demo.",
+                          "This permanently removes custom products, orders and uploaded images, restores the seed collection, and clears the request log. This action cannot be undone.",
                         path: "admin/reset",
                       })
                     }
