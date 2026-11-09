@@ -109,6 +109,9 @@ export function Shop({
     } else if (path === "/products") setRouteView("products");
     else if (path === "/cart") setRouteView("cart");
     else setRouteView("home");
+    navigator.serviceWorker?.ready.then((reg) =>
+      reg.active?.postMessage({ type: "CACHE_PAGE", path: location.pathname }),
+    );
   }, [initialView, initialSlug]);
   const view = routeView,
     slug = routeSlug;
@@ -177,6 +180,22 @@ export function Shop({
     const orderFailed = (event: Event) =>
       setToast((event as CustomEvent<string>).detail);
     window.addEventListener("order-failed", orderFailed);
+    const offlineNav = (event: MouseEvent) => {
+      if (!navigator.onLine) {
+        const a = (event.target as HTMLElement).closest("a");
+        if (
+          a &&
+          a.origin === location.origin &&
+          !event.metaKey &&
+          !event.ctrlKey
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          location.assign(a.href);
+        }
+      }
+    };
+    document.addEventListener("click", offlineNav, true);
     const prompt = (e: Event) => {
       e.preventDefault();
       setInstall(e);
@@ -184,6 +203,7 @@ export function Shop({
     window.addEventListener("beforeinstallprompt", prompt);
     return () => {
       window.removeEventListener("beforeinstallprompt", prompt);
+      document.removeEventListener("click", offlineNav, true);
       window.removeEventListener("order-received", receipt);
       window.removeEventListener("order-failed", orderFailed);
     };

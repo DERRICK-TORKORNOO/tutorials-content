@@ -16,7 +16,10 @@ const Devtools =
     : () => null;
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(createQueryClient);
-
+  useEffect(() => {
+    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production")
+      navigator.serviceWorker.register("/sw.js");
+  }, []);
   return (
     <PersistQueryClientProvider
       client={client}
