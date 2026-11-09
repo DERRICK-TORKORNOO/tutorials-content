@@ -1,8 +1,9 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createQueryClient } from "@/lib/queryClient";
+import { persister, restoredQueries } from "@/lib/persist";
 const Devtools =
   process.env.NODE_ENV === "development"
     ? dynamic(
@@ -15,10 +16,28 @@ const Devtools =
     : () => null;
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(createQueryClient);
+
   return (
-    <QueryClientProvider client={client}>
+    <PersistQueryClientProvider
+      client={client}
+      persistOptions={{
+        persister,
+        maxAge: 86400000,
+        buster: process.env.NEXT_PUBLIC_APP_VERSION ?? "1.0.0",
+        dehydrateOptions: {
+          shouldDehydrateQuery: (q) =>
+            q.state.status === "success" && q.queryKey[0] !== "admin",
+        },
+      }}
+      onSuccess={() => {
+        client
+          .getQueryCache()
+          .getAll()
+          .forEach((query) => restoredQueries.add(query.queryHash));
+      }}
+    >
       {children}
       <Devtools />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
