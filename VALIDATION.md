@@ -2,6 +2,8 @@
 
 The user has not created a Supabase account yet. No external database, bucket, account or deployment was created.
 
+All five active milestone branches passed lint, TypeScript, the integration suite and production builds. `main` and `step-5-offline-ux` point to the finished app.
+
 ## Automated coverage
 
 The actual Drizzle repository and Hono API are exercised with test-only PostgreSQL WASM (PGlite). There is no application memory fallback.
@@ -22,6 +24,8 @@ The actual Drizzle repository and Hono API are exercised with test-only PostgreS
 - Desktop and 390px admin layouts checked; tables scroll within their panels without widening the page.
 - Test-only preview verified sign-in, live overview, inline price save, product form validation, two-image upload/previews/reorder, product creation, archive confirmation, restore, and the delayed-order label.
 - Production build and client-bundle secret scan passed; the fake build-time service-role sentinel was absent from browser assets.
+- A 4.95 MB source image was saved through a test proxy enforcing a 4.5 MB request limit, verifying browser preparation before the API upload.
+- The unconfigured production API returned the documented 503 `SETUP_REQUIRED` response.
 - `make help`, schema generation and SQL export were exercised without any Supabase credentials.
 
 ## Limitations

@@ -146,15 +146,20 @@ export function Shop({
     view === "detail" ? detail : catalog,
     view === "detail" ? ["product", slug] : ["products", {}],
   );
+  const [backOnline, setBackOnline] = useState(false);
+  useEffect(() => {
+    const show = () => {
+      setBackOnline(true);
+      setTimeout(() => setBackOnline(false), 2000);
+    };
+    window.addEventListener("online", show);
+    return () => window.removeEventListener("online", show);
+  }, []);
   const order = useMutation<
     { orderRef: string; total: number },
     Error,
     OrderInput
-  >({
-    mutationKey: ["placeOrder"],
-    networkMode: "always",
-    onError: (e) => setToast(e.message),
-  });
+  >({ mutationKey: ["placeOrder"], onError: (e) => setToast(e.message) });
   const pendingOrders = useMutationState({
     filters: { mutationKey: ["placeOrder"], status: "pending" },
     select: (mutation) => mutation.state.isPaused,
@@ -319,6 +324,16 @@ export function Shop({
           </div>
         </div>
       </header>
+      {backOnline && (
+        <div className="offline online">
+          <Check size={16} /> Back online. All caught up.
+        </div>
+      )}
+      {!online && (
+        <div className="offline">
+          <WifiOff size={16} /> You’re offline. Showing saved products.
+        </div>
+      )}
       {searchOpen && (
         <div className="container search-bar">
           <Search size={20} />
@@ -834,6 +849,20 @@ export function Shop({
             © {new Date().getFullYear()} Kudi Store. Made for your rhythm.
           </span>
           <span>Designed for life. Even offline.</span>
+          {install && (
+            <button onClick={() => install.prompt?.()}>
+              Install app <ArrowDown size={14} />
+            </button>
+          )}
+          {ios && (
+            <button
+              onClick={() =>
+                setToast("In Safari, tap Share, then Add to Home Screen.")
+              }
+            >
+              Install app
+            </button>
+          )}
         </div>
       </footer>
       {toast && (
