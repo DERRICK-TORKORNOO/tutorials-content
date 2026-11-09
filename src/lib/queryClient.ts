@@ -4,9 +4,11 @@ export function createQueryClient() {
   const client = new QueryClient({
     defaultOptions: {
       queries: {
-        // Version checks own freshness; avoid unnecessary catalog downloads.
-        staleTime: Infinity,
+        // Reuse fresh data for a minute so revisiting does not hit the API.
+        staleTime: 60_000,
+        // Keep visited data in memory for one day.
         gcTime: 86400000,
+        // Retry once without trapping the demo in a long retry loop.
         retry: 1,
         refetchOnReconnect: true,
       },

@@ -1,4 +1,4 @@
-import { Stats } from "@/components/stats";
+import { redirect } from "next/navigation";
 export default function Page() {
-  return <Stats />;
+  redirect("/admin");
 }

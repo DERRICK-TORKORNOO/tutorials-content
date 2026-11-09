@@ -27,11 +27,11 @@ import {
   ArrowDown,
   Menu,
 } from "lucide-react";
-import { CartItem } from "@/lib/api";
+import { CartItem, OrderInput, ApiError } from "@/lib/api";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useDataSource } from "@/hooks/useDataSource";
-import { Product, money, BRAND } from "@/lib/products";
-const categories = [
+import { ProductSummary, money, BRAND } from "@/lib/products";
+const fallbackCategories = [
   "All essentials",
   "Sneakers",
   "Headphones",
@@ -47,7 +47,13 @@ function useOnline() {
     () => true,
   );
 }
-function Card({ p, onAdd }: { p: Product; onAdd: (p: Product) => void }) {
+function Card({
+  p,
+  onAdd,
+}: {
+  p: ProductSummary;
+  onAdd: (p: ProductSummary) => void;
+}) {
   const [liked, setLiked] = useState(false);
   return (
     <article className="product-card">
@@ -103,9 +109,6 @@ export function Shop({
     } else if (path === "/products") setRouteView("products");
     else if (path === "/cart") setRouteView("cart");
     else setRouteView("home");
-    navigator.serviceWorker?.ready.then((reg) =>
-      reg.active?.postMessage({ type: "CACHE_PAGE", path: location.pathname }),
-    );
   }, [initialView, initialSlug]);
   const view = routeView,
     slug = routeSlug;
@@ -131,25 +134,24 @@ export function Shop({
     return () => clearInterval(timer);
   }, []);
   const online = useOnline();
-  const { catalog, detail } = useCatalog(slug);
+  const { catalog, detail, categories: categoryQuery } = useCatalog(slug);
+  const categories = [
+    "All essentials",
+    ...(categoryQuery.data?.map((c) => c.name) ?? fallbackCategories.slice(1)),
+  ];
   const source = useDataSource(
     view === "detail" ? detail : catalog,
     view === "detail" ? ["product", slug] : ["products", {}],
   );
-  const [backOnline, setBackOnline] = useState(false);
-  useEffect(() => {
-    const show = () => {
-      setBackOnline(true);
-      setTimeout(() => setBackOnline(false), 2000);
-    };
-    window.addEventListener("online", show);
-    return () => window.removeEventListener("online", show);
-  }, []);
   const order = useMutation<
     { orderRef: string; total: number },
     Error,
-    { items: CartItem[]; requestId: string }
-  >({ mutationKey: ["placeOrder"], onError: (e) => setToast(e.message) });
+    OrderInput
+  >({
+    mutationKey: ["placeOrder"],
+    networkMode: "always",
+    onError: (e) => setToast(e.message),
+  });
   const pendingOrders = useMutationState({
     filters: { mutationKey: ["placeOrder"], status: "pending" },
     select: (mutation) => mutation.state.isPaused,
@@ -175,22 +177,6 @@ export function Shop({
     const orderFailed = (event: Event) =>
       setToast((event as CustomEvent<string>).detail);
     window.addEventListener("order-failed", orderFailed);
-    const offlineNav = (event: MouseEvent) => {
-      if (!navigator.onLine) {
-        const a = (event.target as HTMLElement).closest("a");
-        if (
-          a &&
-          a.origin === location.origin &&
-          !event.metaKey &&
-          !event.ctrlKey
-        ) {
-          event.preventDefault();
-          event.stopPropagation();
-          location.assign(a.href);
-        }
-      }
-    };
-    document.addEventListener("click", offlineNav, true);
     const prompt = (e: Event) => {
       e.preventDefault();
       setInstall(e);
@@ -198,7 +184,6 @@ export function Shop({
     window.addEventListener("beforeinstallprompt", prompt);
     return () => {
       window.removeEventListener("beforeinstallprompt", prompt);
-      document.removeEventListener("click", offlineNav, true);
       window.removeEventListener("order-received", receipt);
       window.removeEventListener("order-failed", orderFailed);
     };
@@ -212,7 +197,7 @@ export function Shop({
       return () => clearTimeout(t);
     }
   }, [toast]);
-  const add = (p: Product) => {
+  const add = (p: ProductSummary) => {
     if (hasPendingOrder) {
       setToast(
         "Your order is saved. Wait for it to finish before adding more.",
@@ -314,16 +299,6 @@ export function Shop({
           </div>
         </div>
       </header>
-      {backOnline && (
-        <div className="offline online">
-          <Check size={16} /> Back online. All caught up.
-        </div>
-      )}
-      {!online && (
-        <div className="offline">
-          <WifiOff size={16} /> You’re offline. Showing saved products.
-        </div>
-      )}
       {searchOpen && (
         <div className="container search-bar">
           <Search size={20} />
@@ -440,7 +415,7 @@ export function Shop({
             <div className="catalog-toolbar">
               <div className="chips">
                 {categories.map((c, i) => {
-                  const Icon = icons[i];
+                  const Icon = icons[i] ?? ShoppingBag;
                   return (
                     <button
                       key={c}
@@ -489,11 +464,12 @@ export function Shop({
               </div>
             ) : (
               <div className="product-grid">
-                {(view === "home" ? filtered.slice(0, 4) : filtered).map(
-                  (p) => (
-                    <Card key={p.slug} p={p} onAdd={add} />
-                  ),
-                )}
+                {(view === "home"
+                  ? filtered.filter((p) => p.featured).slice(0, 4)
+                  : filtered
+                ).map((p) => (
+                  <Card key={p.slug} p={p} onAdd={add} />
+                ))}
               </div>
             )}
             <div className="catalog-bottom">
@@ -520,8 +496,16 @@ export function Shop({
               <div className="skeleton" />
             ) : detail.isError ? (
               <div className="empty">
-                <h2>Product unavailable</h2>
+                <h2>
+                  {detail.error instanceof ApiError &&
+                  detail.error.status === 404
+                    ? "This product is no longer available"
+                    : "Product unavailable"}
+                </h2>
                 <p>{detail.error.message}</p>
+                <Link className="text-link" href="/products">
+                  Back to the shop <ArrowRight size={17} />
+                </Link>
                 <button className="button" onClick={() => detail.refetch()}>
                   Retry
                 </button>
@@ -713,7 +697,31 @@ export function Shop({
                           <X size={19} />
                         </button>
                       </div>
-                    ) : null;
+                    ) : (
+                      <div
+                        className="cart-item unavailable-item"
+                        key={item.slug}
+                      >
+                        <div>
+                          <h3>This product is no longer available</h3>
+                          <p>
+                            {item.slug.replaceAll("-", " ")} · remove it to
+                            continue.
+                          </p>
+                        </div>
+                        <button
+                          disabled={hasPendingOrder}
+                          aria-label={`Remove ${item.slug}`}
+                          onClick={() =>
+                            setCart((old) =>
+                              old.filter((row) => row.slug !== item.slug),
+                            )
+                          }
+                        >
+                          <X size={19} />
+                        </button>
+                      </div>
+                    );
                   })}
                 </div>
                 <aside className="order-summary">
@@ -733,11 +741,18 @@ export function Shop({
                   </p>
                   <button
                     className="button"
-                    disabled={hasPendingOrder}
+                    disabled={
+                      hasPendingOrder ||
+                      cart.some((item) => {
+                        const p = data.find((p) => p.slug === item.slug);
+                        return !p || p.stock < item.qty;
+                      })
+                    }
                     onClick={() =>
                       order.mutate({
                         items: cart,
                         requestId: `KD-${crypto.randomUUID()}`,
+                        createdAt: new Date().toISOString(),
                       })
                     }
                   >
@@ -799,20 +814,6 @@ export function Shop({
             © {new Date().getFullYear()} Kudi Store. Made for your rhythm.
           </span>
           <span>Designed for life. Even offline.</span>
-          {install && (
-            <button onClick={() => install.prompt?.()}>
-              Install app <ArrowDown size={14} />
-            </button>
-          )}
-          {ios && (
-            <button
-              onClick={() =>
-                setToast("In Safari, tap Share, then Add to Home Screen.")
-              }
-            >
-              Install app
-            </button>
-          )}
         </div>
       </footer>
       {toast && (
@@ -827,8 +828,17 @@ export function Shop({
       {debug && (view === "products" || view === "detail") && (
         <div className="debug">
           {source} · fetched{" "}
-          {Math.max(0, Math.floor((now - catalog.dataUpdatedAt) / 60000))} min
-          ago
+          {Math.max(
+            0,
+            Math.floor(
+              (now -
+                (view === "detail"
+                  ? detail.dataUpdatedAt
+                  : catalog.dataUpdatedAt)) /
+                60000,
+            ),
+          )}{" "}
+          min ago
         </div>
       )}
     </>
