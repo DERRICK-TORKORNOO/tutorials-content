@@ -1,0 +1,22 @@
+[
+  {
+    "slug": "sneakers",
+    "name": "Sneakers",
+    "count": 3
+  },
+  {
+    "slug": "headphones",
+    "name": "Headphones",
+    "count": 3
+  },
+  {
+    "slug": "watches",
+    "name": "Watches",
+    "count": 3
+  },
+  {
+    "slug": "bags",
+    "name": "Bags",
+    "count": 3
+  }
+]

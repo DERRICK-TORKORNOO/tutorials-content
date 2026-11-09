@@ -1,0 +1,200 @@
+[
+  {
+    "slug": "everyday-runner",
+    "name": "Everyday Runner",
+    "category": "Sneakers",
+    "reviewCount": 124,
+    "stock": 18,
+    "badge": "BESTSELLER",
+    "description": "Meet your new everyday favourite. Everyday Runner brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/sneaker.webp",
+      "/img/products/sneaker-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": true,
+    "price": 680,
+    "rating": 4.8,
+    "currency": "GHS"
+  },
+  {
+    "slug": "studio-wireless",
+    "name": "Studio Wireless",
+    "category": "Headphones",
+    "reviewCount": 141,
+    "stock": 19,
+    "badge": "NEW",
+    "description": "Meet your new everyday favourite. Studio Wireless brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/headphones.webp",
+      "/img/products/headphones-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": true,
+    "price": 1250,
+    "rating": 4.7,
+    "currency": "GHS"
+  },
+  {
+    "slug": "the-weekender",
+    "name": "The Weekender",
+    "category": "Bags",
+    "reviewCount": 158,
+    "stock": 20,
+    "badge": null,
+    "description": "Meet your new everyday favourite. The Weekender brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/bag.webp", "/img/products/bag-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": true,
+    "price": 890,
+    "rating": 4.6,
+    "currency": "GHS"
+  },
+  {
+    "slug": "classic-chrono",
+    "name": "Classic Chrono",
+    "category": "Watches",
+    "reviewCount": 175,
+    "stock": 21,
+    "badge": "POPULAR",
+    "description": "Meet your new everyday favourite. Classic Chrono brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/watch.webp", "/img/products/watch-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": true,
+    "price": 1450,
+    "rating": 4.8,
+    "currency": "GHS"
+  },
+  {
+    "slug": "court-low",
+    "name": "Court Low",
+    "category": "Sneakers",
+    "reviewCount": 192,
+    "stock": 22,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Court Low brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/sneaker.webp",
+      "/img/products/sneaker-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 540,
+    "rating": 4.7,
+    "currency": "GHS"
+  },
+  {
+    "slug": "sound-studio-pro",
+    "name": "Sound Studio Pro",
+    "category": "Headphones",
+    "reviewCount": 209,
+    "stock": 23,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Sound Studio Pro brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/headphones.webp",
+      "/img/products/headphones-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 1680,
+    "rating": 4.6,
+    "currency": "GHS"
+  },
+  {
+    "slug": "city-carryall",
+    "name": "City Carryall",
+    "category": "Bags",
+    "reviewCount": 226,
+    "stock": 24,
+    "badge": "NEW",
+    "description": "Meet your new everyday favourite. City Carryall brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/bag.webp", "/img/products/bag-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 720,
+    "rating": 4.8,
+    "currency": "GHS"
+  },
+  {
+    "slug": "everyday-timepiece",
+    "name": "Everyday Timepiece",
+    "category": "Watches",
+    "reviewCount": 243,
+    "stock": 25,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Everyday Timepiece brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/watch.webp", "/img/products/watch-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 980,
+    "rating": 4.7,
+    "currency": "GHS"
+  },
+  {
+    "slug": "trail-runner",
+    "name": "Trail Runner",
+    "category": "Sneakers",
+    "reviewCount": 260,
+    "stock": 26,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Trail Runner brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/sneaker.webp",
+      "/img/products/sneaker-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 820,
+    "rating": 4.6,
+    "currency": "GHS"
+  },
+  {
+    "slug": "daily-audio",
+    "name": "Daily Audio",
+    "category": "Headphones",
+    "reviewCount": 277,
+    "stock": 27,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Daily Audio brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": [
+      "/img/products/headphones.webp",
+      "/img/products/headphones-detail.webp"
+    ],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 780,
+    "rating": 4.8,
+    "currency": "GHS"
+  },
+  {
+    "slug": "daily-crossbody",
+    "name": "Daily Crossbody",
+    "category": "Bags",
+    "reviewCount": 294,
+    "stock": 28,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Daily Crossbody brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/bag.webp", "/img/products/bag-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 460,
+    "rating": 4.7,
+    "currency": "GHS"
+  },
+  {
+    "slug": "minimal-dial",
+    "name": "Minimal Dial",
+    "category": "Watches",
+    "reviewCount": 311,
+    "stock": 29,
+    "badge": null,
+    "description": "Meet your new everyday favourite. Minimal Dial brings considered design, lasting comfort and thoughtful details to wherever the day takes you. Made for your rhythm.",
+    "images": ["/img/products/watch.webp", "/img/products/watch-detail.webp"],
+    "colors": ["#e6dfd2", "#333b32", "#b27b57"],
+    "featured": false,
+    "price": 1150,
+    "rating": 4.6,
+    "currency": "GHS"
+  }
+]
